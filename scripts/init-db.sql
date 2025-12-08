@@ -69,3 +69,32 @@ CREATE INDEX IF NOT EXISTS idx_signatures_email_signed_at
 ALTER TABLE documents.documents REPLICA IDENTITY FULL;
 ALTER TABLE signatures.signatures REPLICA IDENTITY FULL;
 
+-- TRIGGERS
+
+-- Auto-update updated_at timestamp
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at=CURRENT_TIMESTAMP;
+    RETURN NEW;
+END;
+$$ language plpgsql;
+
+
+DROP TRIGGER IF EXISTS update_documents_updated_at ON documents.documents;
+CREATE TRIGGER update_documents_updated_at
+    BEFORE UPDATE ON documents.documents
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at_column();
+
+-- GRANTS
+GRANT USAGE ON SCHEMA documents TO ebemad;
+GRANT USAGE ON SCHEMA signatures TO ebemad;
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA documents TO ebemad;
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA signatures TO ebemad;
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA documents TO ebemad;
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA signatures TO ebemad;
+
+-- STATISTICS
+ANALYZE documents.documents;
+ANALYZE signatures.signatures;

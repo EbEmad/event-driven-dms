@@ -5,12 +5,13 @@ services:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_DB}
+    restart: always
     ports:
       - "5432:5432"
 
     volumes:
-      - postgres_data:/var/lib/postgresql/data
-      #- ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+      #- postgres_data:/var/lib/postgresql/data
+      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
 
     command:
       - "postgres"
@@ -113,5 +114,4 @@ services:
 networks:
   docs-network:
     driver: bridge
-volumes:
-  postgres_data:
+
