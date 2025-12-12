@@ -1,7 +1,7 @@
-from pg.schemes import DocumentCreate, DocumentResponse, DocumentUpdate
-from pg.models import Document,DocumentStatus
-from pg.database import get_db,engine,Base
-from pg.config import get_settings
+from db.schemes import DocumentCreate, DocumentResponse, DocumentUpdate
+from db.models import Document,DocumentStatus
+from db.database import get_db,engine,Base
+from db.config import get_settings
 from fastapi import Depends, FastAPI, HTTPException, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
