@@ -266,7 +266,9 @@ services:
           memory: 256M
 
   signature-service:
-    build: ./services/signature
+    build: 
+      context: .
+      dockerfile: services/signature/Dockerfile
     container_name: docs-signature-service
     restart: always
     ports:
