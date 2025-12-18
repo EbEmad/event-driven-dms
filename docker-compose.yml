@@ -278,6 +278,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    volumes:
+      - ./services/signature/app/db:/app/db
     networks:
       - docs-network
     deploy:
