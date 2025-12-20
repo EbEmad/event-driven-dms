@@ -3,6 +3,7 @@ from db.config import get_settings
 from db.database import engine,Base,get_db
 from db.schemes import SignatureCreate,SignatureResponse
 from db.models import Signature
+from db.grpc_client import grpc_client
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from contextlib import asynccontextmanager
@@ -23,6 +24,9 @@ async def lifespan(app: FastAPI):
 
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+
+
+    await grpc_client.connect()
         
     
     logger.info(f"{settings.service_name} started")
@@ -31,6 +35,7 @@ async def lifespan(app: FastAPI):
 
     logger.info(f"{settings.service_name} shutting down...")
     await engine.dispose()
+    await grpc_client.disconnect()
     logger.info(f"{settings.service_name} stopped")
 
 
@@ -64,6 +69,14 @@ async def create_signature(
     db:AsyncSession=Depends(get_db)
 ):
 
+    # Validate document exists via gRPC
+    exists = await grpc_client.document_exists(str(signature.document_id))
+    if not exists:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Document {signature.document_id} not found"
+        )
+
     # Get client IP
     client_ip = signature.ip_address or request.client.host
 
@@ -81,9 +94,30 @@ async def create_signature(
     db.add(db_signature)
     await db.flush()
 
+    # Update document status via gRPC
+    background_tasks.add_task(
+        update_document_status_grpc,
+        str(signature.document_id)
+    )
+    
 
     await db.commit()
     await db.refresh(db_signature)
     logger.info(f"Signature created: {db_signature.id} for document {signature.document_id}")
     return db_signature
 
+async def update_document_status_grpc(document_id:str):
+    """Update document status to 'signed' via gRPC."""
+    try:
+        response=await grpc_client.update_document_status(
+            document_id=document_id,
+            status="signed"
+        )
+        if response:
+            logger.info(
+                f"Document {document_id} updated to 'signed' (v{response.version})"
+            )
+        else:
+            logger.error(f"Failed to update document {document_id} status")
+    except Exception as e:
+        logger.error(f"Error updating document status: {e}", exc_info=True)
