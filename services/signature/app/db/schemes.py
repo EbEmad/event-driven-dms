@@ -10,6 +10,7 @@ class SignatureCreate(BaseModel):
     signer_name: str = Field(..., min_length=1, max_length=255)
     signature_data: str | None = None
     ip_address: str | None = None
+    document_status: str = Field(default="signed", description="Status to set on the document after signature")
 
     @validator("signature_data")
     def validate_signature_size(cls,v):

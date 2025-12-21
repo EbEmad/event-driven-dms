@@ -42,7 +42,8 @@ curl -X POST http://localhost:8002/signatures \
     "document_id": "YOUR_DOCUMENT_ID",
     "signer_email": "ebemad@client.com",
     "signer_name": "Ebrahim Emad",
-    "signature_data": "base64encoded_signature_image_data_here"
+    "signature_data": "base64encoded_signature_image_data_here",
+    "document_status":"pending"
   }' | jq '.'
 ```
 

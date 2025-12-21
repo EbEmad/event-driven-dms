@@ -97,7 +97,8 @@ async def create_signature(
     # Update document status via gRPC
     background_tasks.add_task(
         update_document_status_grpc,
-        str(signature.document_id)
+        str(signature.document_id),
+        signature.document_status
     )
     
 
@@ -106,12 +107,12 @@ async def create_signature(
     logger.info(f"Signature created: {db_signature.id} for document {signature.document_id}")
     return db_signature
 
-async def update_document_status_grpc(document_id:str):
-    """Update document status to 'signed' via gRPC."""
+async def update_document_status_grpc(document_id:str, status:str="signed"):
+    """Update document status via gRPC."""
     try:
         response=await grpc_client.update_document_status(
             document_id=document_id,
-            status="signed"
+            status=status
         )
         if response:
             logger.info(

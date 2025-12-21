@@ -15,6 +15,8 @@ class DocumentStatus(str,Enum):
     SIGNED = "signed"
     ARCHIVED = "archived"
     CANCELLED = "cancelled"
+    APPROVED = "approved"
+    PENDING = "pending"
 
 
 class Document(Base):
