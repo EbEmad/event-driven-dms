@@ -24,7 +24,7 @@ curl -X POST http://localhost:8005/documents \
   -d '{
     "title": "Sales Agreement Q4 2025",
     "content": "This agreement outlines the terms...",
-    "created_by": "john.doe@company.com"
+    "created_by": "ebemad@company.com"
   }' | jq '.'
 ```
 *Response:* Note the `id` field from the response (e.g., `06946681-6080-71f1-8000-e0ba48255d59`).
@@ -40,8 +40,8 @@ curl -X POST http://localhost:8002/signatures \
   -H "Content-Type: application/json" \
   -d '{
     "document_id": "YOUR_DOCUMENT_ID",
-    "signer_email": "jane.smith@client.com",
-    "signer_name": "Jane Smith",
+    "signer_email": "ebemad@client.com",
+    "signer_name": "Ebrahim Emad",
     "signature_data": "base64encoded_signature_image_data_here"
   }' | jq '.'
 ```
