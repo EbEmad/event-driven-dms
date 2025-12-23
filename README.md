@@ -18,6 +18,18 @@ You can test the flow (Document Creation -> Signature -> Status Update) using th
 ### 1. Create a Document
 **Service:** Document Service (Port 8005)
 
+**Option A: Inline JSON**
+```bash
+curl -X POST http://localhost:8005/documents \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Sales Agreement Q4 2025",
+    "content": "This agreement outlines the terms...",
+    "created_by": "ebemad@company.com"
+  }' | jq '.'
+```
+
+**Option B: Using a JSON File (S3 Upload)**
 ```bash
 curl -X POST http://localhost:8005/documents \
   -H "Content-Type: application/json" \
