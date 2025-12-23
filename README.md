@@ -21,11 +21,7 @@ You can test the flow (Document Creation -> Signature -> Status Update) using th
 ```bash
 curl -X POST http://localhost:8005/documents \
   -H "Content-Type: application/json" \
-  -d '{
-    "title": "Sales Agreement Q4 2025",
-    "content": "This agreement outlines the terms...",
-    "created_by": "ebemad@company.com"
-  }' | jq '.'
+  -d @sample_doc.json | jq '.'
 ```
 *Response:* Note the `id` field from the response (e.g., `06946681-6080-71f1-8000-e0ba48255d59`).
 
