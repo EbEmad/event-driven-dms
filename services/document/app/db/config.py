@@ -3,7 +3,8 @@ from functools import lru_cache
 
 class Settings(BaseSettings):
     database_url: str
-
+    redis_url: str
+    redis_cache_ttl:int=300
     minio_endpoint: str
     minio_access_key: str
     minio_secret_key: str
