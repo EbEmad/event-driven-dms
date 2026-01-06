@@ -10,6 +10,11 @@
 ##  Overview
 
 A microservices architecture showing event-driven document management with Change Data Capture (CDC), real-time updates, and full-text search capabilities. Built entirely with **async Python** for maximum throughput and minimal resource consumption.
+
+##  Architecture
+
+### High-Level Flow
+![alt text](images/archecture.png)
 ### Detailed Architecture Diagram
 
 ```mermaid
