@@ -13,7 +13,6 @@ A microservices architecture showing event-driven document management with Chang
 
 ##  Architecture
 
-### High-Level Flow
 ![alt text](images/archecture.png)
 
 ### Detailed Architecture Diagram
