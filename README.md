@@ -12,8 +12,9 @@
 A microservices architecture showing event-driven document management with Change Data Capture (CDC), real-time updates, and full-text search capabilities. Built entirely with **async Python** for maximum throughput and minimal resource consumption.
 
 ##  Architecture
-
-![alt text](images/archecture.png)
+<p align="center">
+  <img src="images/architecture.png" alt="Architecture Diagram" width="700"/>
+</p>
 
 ### Detailed Architecture Diagram
 
