@@ -3,12 +3,12 @@ from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    kafka_bootstrap_servers: str
-    kafka_consumer_group: str 
-    elasticsearch_url: str
-    elasticsearch_index_documents: str
-    cdc_documents_topic: str 
-    service_name: str 
+    KAFKA_BOOTSTRAP_SERVERS: str
+    KAFKA_CONSUMER_GROUP: str 
+    ELASTICSEARCH_URL: str
+    ELASTICSEARCH_INDEX_DOCUMENTS: str
+    CDC_DOCUMENTS_TOPIC: str 
+    SERVICE_NAME: str 
 
     class Config:
         env_file = ".env"

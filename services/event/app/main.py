@@ -20,8 +20,8 @@ class EventProcessor:
 
     def __init__(self):
         self.app=Application(
-            broker_address=settings.kafka_bootstrap_servers,
-            consumer_group=settings.kafka_consumer_group,
+            broker_address=settings.KAFKA_BOOTSTRAP_SERVERS,
+            consumer_group=settings.KAFKA_CONSUMER_GROUP,
             auto_offset_reset="earliest",
         )
 
@@ -39,30 +39,32 @@ class EventProcessor:
             if op in ["r","d"]:
                 return None
             
-            after=value.get('after',{})
-            document_id=after.get("id")
-            # Skip if no S3 content yet
-            if not after.get("s3_key"):
-                return None
-
-            # Transform to ES document
+            # Document is already enriched with quality metadata from data-quality service
+            # Just pass it through to Elasticsearch
             return {
-                "id": str(document_id),
-                "title": after.get("title", ""),
-                "status": after.get("status", "created"),
-                "created_by": after.get("created_by", ""),
-                "content_type": after.get("content_type"),
-                "content_size": after.get("content_size", 0),
-                "created_at": after.get("created_at"),
-                "updated_at": after.get("updated_at"),
-                "version": after.get("version", 1),
+                "id": str(value.get("id")),
+                "title": value.get("title", ""),
+                "status": value.get("status", "created"),
+                "created_by": value.get("created_by", ""),
+                "content_type": value.get("content_type"),
+                "content_size": value.get("content_size", 0),
+                "created_at": value.get("created_at"),
+                "updated_at": value.get("updated_at"),
+                "version": value.get("version", 1),
+                
+                # Quality metadata from data-quality service
+                "quality_score": value.get("quality_score", 0),
+                "quality_is_valid": value.get("quality_is_valid", False),
+                "quality_issues": value.get("quality_issues", []),
+                "has_pii": value.get("has_pii", False),
+                "quality_checks": value.get("quality_checks", {}),
             }
 
         except Exception as e:
             logger.error(f"Failed to transform event: {e}")
             return None
     def start(self):
-        logger.info(f"{settings.service_name} starting...")
+        logger.info(f"{settings.SERVICE_NAME} starting...")
 
         try:
             # Document ID extractor for ES
@@ -70,8 +72,8 @@ class EventProcessor:
                 return str(item.value.get("id"))
             
             es_sink = ElasticsearchSink(
-                url=settings.elasticsearch_url,
-                index=settings.elasticsearch_index_documents,
+                url=settings.ELASTICSEARCH_URL,
+                index=settings.ELASTICSEARCH_INDEX_DOCUMENTS,
                 document_id_setter=get_document_id,
                 batch_size=50,
                 mapping={
@@ -98,20 +100,42 @@ class EventProcessor:
                                 "format": "strict_date_optional_time||epoch_millis",
                             },
                             "version": {"type": "integer"},
+                            
+                            # Quality metadata fields
+                            "quality_score": {"type": "float"},
+                            "quality_is_valid": {"type": "boolean"},
+                            "has_pii": {"type": "boolean"},
+                            "quality_issues": {
+                                "type": "nested",
+                                "properties": {
+                                    "type": {"type": "keyword"},
+                                    "severity": {"type": "keyword"},
+                                    "description": {"type": "text"},
+                                    "field": {"type": "keyword"},
+                                }
+                            },
+                            "quality_checks": {
+                                "properties": {
+                                    "completeness": {"type": "float"},
+                                    "consistency": {"type": "float"},
+                                    "pii_detection": {"type": "float"},
+                                    "language_quality": {"type": "float"},
+                                }
+                            },
                         }
                     }
                 },
             )
 
-            # Documents topic
-            topic = self.app.topic(settings.cdc_documents_topic, value_deserializer="json")
+            # Documents topic - now consuming quality-checked events from settings
+            topic = self.app.topic(settings.CDC_DOCUMENTS_TOPIC, value_deserializer="json")
 
             sdf = self.app.dataframe(topic)
             sdf = sdf.apply(self._transform_for_elasticsearch, metadata=True)
             sdf = sdf.filter(lambda v: v is not None)
             sdf.sink(es_sink)
 
-            logger.info(f"Processing: {settings.cdc_documents_topic} -> Elasticsearch")
+            logger.info(f"Processing: {settings.CDC_DOCUMENTS_TOPIC} -> Elasticsearch")
 
             self.app.run()
         except KeyboardInterrupt:
