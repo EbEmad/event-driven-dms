@@ -9,7 +9,7 @@
 
 ## Overview
 
-A high-performance document management system built on a **microservices architecture**, featuring **event-driven** patterns, **Change Data Capture (CDC)**, and real-time updates. This project demonstrates advanced backend concepts using **Async Python (FastAPI)**, **Kafka**, **Elasticsearch**, and **Redis**.
+A high-performance document management system built on a **microservices architecture**, featuring **event-driven** patterns, **Change Data Capture (CDC)**, and real-time updates. This project demonstrates advanced  concepts using **Async Python (FastAPI)**, **Kafka**, **Elasticsearch**, and **Redis**.
 
 ## Key Features
 
