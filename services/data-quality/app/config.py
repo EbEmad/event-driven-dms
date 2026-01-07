@@ -9,29 +9,31 @@ class Settings(BaseSettings):
     service_name: str = "data-quality"
     
     # LLM Provider Settings
-    llm_provider: str 
-    openai_api_key: str 
-    gemini_api_key: str
-    openai_model: str 
-    gemini_model: str
+    LLM_PROVIDER: str 
+    OPENAI_API_KEY: str 
+    OPENAI_API_URL: str
+    GEMINI_API_KEY: str
+    OPENAI_MODEL: str 
+    GEMINI_MODEL: str
+    INPUT_DEFAULT_MAX_CHARACTERS: int = 1024
 
 
     # Quality Thresholds
-    min_quality_score: float = 50.0  # 0-100 scale
-    block_low_quality: bool = False  # If True, don't publish low-quality docs
+    MIN_QUALITY_SCORE: float = 50.0  # 0-100 scale
+    BLOCK_LOW_QUALITY: bool = False  # If True, don't publish low-quality docs
     
     # Kafka Settings
-    kafka_bootstrap_servers: str
-    kafka_consumer_group: str
-    cdc_documents_topic: str 
-    quality_checks_topic: str
+    KAFKA_BOOTSTRAP_SERVERS: str
+    KAFKA_CONSUMER_GROUP: str
+    CDC_DOCUMENTS_TOPIC: str 
+    QUALITY_CHECKS_TOPIC: str
 
     # MinIO Settings (for fetching document content)
-    minio_endpoint: str
-    minio_access_key: str
-    minio_secret_key: str
-    minio_secure: bool = False
-    minio_bucket_documents: str 
+    MINIO_ENDPOINT: str
+    MINIO_ACCESS_KEY: str
+    MINIO_SECRET_KEY: str
+    MINIO_SECURE: bool = False
+    MINIO_BUCKET_DOCUMENTS: str 
 
 
     class Config:

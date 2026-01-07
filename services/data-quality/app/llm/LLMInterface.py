@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from ..schemas import QualityCheckResult
+from .schemas import QualityCheckResult
 class LLMProvider(ABC):
     """Abstract base class for LLM providers."""
 

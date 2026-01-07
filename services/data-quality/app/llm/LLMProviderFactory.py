@@ -15,7 +15,7 @@ class LLMProviderFactory:
                 self.config.OPENAI_API_KEY,
                 self.config.OPENAI_API_URL,
                 self.config.OPENAI_MODEL,
-                self.config.min_quality_score,
+                self.config.MIN_QUALITY_SCORE,
                 self.config.INPUT_DEFAULT_MAX_CHARACTERS
             )
         else:

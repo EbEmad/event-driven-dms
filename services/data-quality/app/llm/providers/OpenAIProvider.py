@@ -1,22 +1,25 @@
 from openai import AsyncOpenAI
-from .config import get_settings
+from ..schemas import CheckResult, QualityCheckResult, ValidationIssue
 from ..LLMInterface import LLMProvider
 import json
+import logging
+logger = logging.getLogger(__name__)
 
 class OpenAIProvider(LLMProvider):
     """OpenAI-based document quality validation."""
-    def __init__(self,default_input_max_characters: int=1000):
-        if not settings.openai_api_key:
+    def __init__(self,openai_api_key:str,openai_api_url:str,openai_model:str, min_quality_score: float, default_input_max_characters: int=1000):
+        if not openai_api_key:
             raise ValueError("OPENAI_API_KEY is not set")
         
         self.default_input_max_characters=default_input_max_characters
-        self.client=AsyncOpenAI(api_key=settings.OPENAI_API_KEY,base_url=settings.OPENAI_API_URL)
-        self.model=settings.OPENAI_MODEL
+        self.client=AsyncOpenAI(api_key=openai_api_key,base_url=openai_api_url)
+        self.model=openai_model
+        self.min_quality_score = min_quality_score
         logger.info(f"OpenAI provider initialized with model: {self.model}")
     async def validate_document(self, title: str, content: str, document_id: str) -> QualityCheckResult:
         """Validate document using OpenAI API."""
 
-        prompt=self.await self._build_validation_prompt(title,content)
+        prompt=self._build_validation_prompt(title,content)
 
         try:
             response=await self.client.chat.completions.create(
@@ -159,7 +162,7 @@ class OpenAIProvider(LLMProvider):
             return QualityCheckResult(
                 document_id=document_id,
                 overall_score=overall_score,
-                is_valid=overall_score >= settings.min_quality_score,
+                is_valid=overall_score >= self.min_quality_score,
                 completeness_check=completeness_check,
                 consistency_check=consistency_check,
                 pii_check=pii_check,
